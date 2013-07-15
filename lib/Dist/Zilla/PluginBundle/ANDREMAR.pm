@@ -14,7 +14,17 @@ sub configure {
     my ($self) = @_;
     my $name = $self->payload->{name};
 
-    $self->add_bundle('@Basic');
+    $self->add_plugins(qw/
+        Git::GatherDir
+        CheckPrereqsIndexed
+        CheckExtraTests
+        /);
+
+
+    $self->add_bundle('@Filter', {
+            '-bundle' => '@Basic',
+            '-remove' => [qw/GatherDir/]
+        });
 
     $self->add_plugins(
         [ 'AutoPrereqs', {
@@ -32,6 +42,10 @@ sub configure {
         PodSyntaxTests
         PodCoverageTests
         Repository
+        Test::ChangesHasContent
+        Test::Compile
+        ReportVersions::Tiny
+        ContributorsFromGit
         ));
 
     $self->add_plugins(
@@ -43,7 +57,7 @@ sub configure {
     );
 
     $self->add_plugins([
-            PodWeaver => { config_plugin => '@RJBS' }
+            PodWeaver => { config_plugin => '@ANDREMAR' }
         ]);
 
     $self->add_bundle('@Git' => {
@@ -54,6 +68,15 @@ sub configure {
         [ 'Git::NextVersion' => {
                 version_regexp => '^(?:' . $name . '|' . lc($name). ')-(.+)$'
             }]
+    );
+
+    $self->add_plugins(
+        [ GithubMeta => {
+                'user' => 'omega',
+                'remote' => [ qw(github origin omega) ],
+                issues => 1,
+            }
+        ]
     );
 }
 
