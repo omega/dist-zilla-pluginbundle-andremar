@@ -46,6 +46,7 @@ sub configure {
         Test::Compile
         ReportVersions::Tiny
         ContributorsFromGit
+        Test::Synopsis
         ));
 
     $self->add_plugins(
