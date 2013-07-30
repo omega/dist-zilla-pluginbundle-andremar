@@ -10,6 +10,12 @@ with 'Dist::Zilla::Role::PluginBundle::Easy';
 use Dist::Zilla::PluginBundle::Basic;
 use Dist::Zilla::PluginBundle::Git;
 
+has 'test_synopsis' => (
+    is => 'ro', isa => 'Bool', lazy => 1,
+    default => sub { $_[0]->payload->{test_synopsis} // 1 },
+);
+
+
 sub configure {
     my ($self) = @_;
     my $name = $self->payload->{name};
@@ -44,10 +50,13 @@ sub configure {
         Repository
         Test::ChangesHasContent
         Test::Compile
+        Test::CPAN::Changes
         ReportVersions::Tiny
         ContributorsFromGit
-        Test::Synopsis
         ));
+    $self->add_plugins(qw(
+        Test::Synopsis
+        )) if $self->test_synopsis;
 
     $self->add_plugins(
         [ Prereqs => 'TestMoreWithSubtests' => {
