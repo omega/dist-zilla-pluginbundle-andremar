@@ -15,6 +15,12 @@ has 'test_synopsis' => (
     default => sub { $_[0]->payload->{test_synopsis} // 1 },
 );
 
+has 'skip_files' => (
+    is => 'ro', isa => 'Str', lazy => 1,
+    default => sub { $_[0]->payload->{skip_files} // '' },
+);
+
+
 
 sub configure {
     my ($self) = @_;
@@ -35,13 +41,13 @@ sub configure {
     $self->add_plugins(
         [ 'AutoPrereqs', {
                 extra_scanners => [qw/MooseXDeclare/],
+                finder => '@ANDREMAR/OurFiles',
                 %{ $self->config_slice( { prereq_skip => 'skip' } ), }
             }
         ]
     );
 
     $self->add_plugins(qw(
-        PkgVersion
         MetaConfig
         MetaJSON
         NextRelease
@@ -54,6 +60,29 @@ sub configure {
         ReportVersions::Tiny
         ContributorsFromGit
         ));
+    if ($self->skip_files) {
+        $self->add_plugins(
+            [ 'FileFinder::Filter' => 'OurFiles' => {
+                    finder => ':InstallModules',
+                    skip => $self->skip_files,
+                }
+            ],
+        );
+    } else {
+        $self->add_plugins(
+            [ 'FileFinder::Filter' => 'OurFiles' => {
+                    finder => ':InstallModules',
+                }
+            ]
+        );
+    }
+    $self->add_plugins(
+        [ 'PkgVersion' => {
+                finder => '@ANDREMAR/OurFiles',
+            }
+        ]
+    );
+
     $self->add_plugins(qw(
         Test::Synopsis
         )) if $self->test_synopsis;
@@ -62,12 +91,15 @@ sub configure {
         [ Prereqs => 'TestMoreWithSubtests' => {
                 -phase => 'test',
                 -type => 'requires',
-                'Test::More' => '0.96'
+                'Test::More' => '0.96',
             } ],
     );
 
     $self->add_plugins([
-            PodWeaver => { config_plugin => '@ANDREMAR' }
+            PodWeaver => {
+                finder => '@ANDREMAR/OurFiles',
+                config_plugin => '@ANDREMAR'
+            }
         ]);
 
     $self->add_bundle('@Git' => {
