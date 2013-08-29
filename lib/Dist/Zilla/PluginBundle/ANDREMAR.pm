@@ -10,19 +10,16 @@ with 'Dist::Zilla::Role::PluginBundle::Easy';
 use Dist::Zilla::PluginBundle::Basic;
 use Dist::Zilla::PluginBundle::Git;
 
-has 'test_synopsis' => (
-    is => 'ro', isa => 'Bool', lazy => 1,
-    default => sub { $_[0]->payload->{test_synopsis} // 1 },
-);
+for my $field (qw/test_synopsis test_pod/) {
+    has $field => (
+        is => 'ro', isa => 'Bool', lazy => 1,
+        default => sub { $_[0]->payload->{$field} // 1 },
+    );
+}
 
 has 'skip_files' => (
     is => 'ro', isa => 'Str', lazy => 1,
     default => sub { $_[0]->payload->{skip_files} // '' },
-);
-
-has test_pod => (
-    is => 'ro', isa => 'Bool', lazy => 1,
-    default => sub { $_[0]->payload->{pod_tests} // 1 },
 );
 
 
