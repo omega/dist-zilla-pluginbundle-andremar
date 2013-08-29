@@ -20,6 +20,12 @@ has 'skip_files' => (
     default => sub { $_[0]->payload->{skip_files} // '' },
 );
 
+has test_pod => (
+    is => 'ro', isa => 'Bool', lazy => 1,
+    default => sub { $_[0]->payload->{pod_tests} // 1 },
+);
+
+
 
 
 sub configure {
@@ -51,15 +57,23 @@ sub configure {
         MetaConfig
         MetaJSON
         NextRelease
-        PodSyntaxTests
-        PodCoverageTests
         Repository
         Test::ChangesHasContent
         Test::Compile
         Test::CPAN::Changes
         ReportVersions::Tiny
         ContributorsFromGit
-        ));
+        )
+    );
+    if ($self->test_pod) {
+        $self->add_plugins(qw(
+            PodSyntaxTests
+            PodCoverageTests
+            )
+        );
+    }
+
+
     if ($self->skip_files) {
         $self->add_plugins(
             [ 'FileFinder::Filter' => 'OurFiles' => {
