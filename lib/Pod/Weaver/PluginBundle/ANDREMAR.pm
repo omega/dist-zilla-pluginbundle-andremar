@@ -17,7 +17,7 @@ around 'mvp_bundle_config' => sub {
     my $orig = shift;
     my @plugins = $orig->();
 
-    unshift(@plugins, [ '@ANDREMAR/Encoding', _exp('-Encoding'), {} ]);
+    unshift(@plugins, [ '@ANDREMAR/SingleEncoding', _exp('-SingleEncoding'), {} ]);
 
     my $i = 0;
     use Data::Dump;
