@@ -10,7 +10,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy';
 use Dist::Zilla::PluginBundle::Basic;
 use Dist::Zilla::PluginBundle::Git;
 
-for my $field (qw/test_synopsis test_pod/) {
+for my $field (qw/test_synopsis test_pod skip_cpan/) {
     has $field => (
         is => 'ro', isa => 'Bool', lazy => 1,
         default => sub { $_[0]->payload->{$field} // 1 },
@@ -36,9 +36,15 @@ sub configure {
         /);
 
 
+    my @removed_plugins = qw(GatherDir);
+
+    if ($self->skip_cpan) {
+        push @removed_plugins, 'UploadToCPAN';
+    }
+
     $self->add_bundle('@Filter', {
             '-bundle' => '@Basic',
-            '-remove' => [qw/GatherDir/]
+            '-remove' => [@removed_plugins]
         });
 
     $self->add_plugins(
@@ -58,7 +64,7 @@ sub configure {
         Test::ChangesHasContent
         Test::Compile
         Test::CPAN::Changes
-        ReportVersions::Tiny
+        Test::ReportPrereqs
         ContributorsFromGit
         )
     );
