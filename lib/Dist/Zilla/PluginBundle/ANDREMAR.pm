@@ -49,7 +49,7 @@ sub configure {
 
     $self->add_plugins(
         [ 'AutoPrereqs', {
-                extra_scanners => [qw/MooseXDeclare/],
+                #extra_scanners => [qw/MooseXDeclare/],
                 finder => '@ANDREMAR/OurFiles',
                 %{ $self->config_slice( { prereq_skip => 'skip' } ), }
             }
@@ -60,7 +60,6 @@ sub configure {
         MetaConfig
         MetaJSON
         NextRelease
-        Repository
         Test::ChangesHasContent
         Test::Compile
         Test::CPAN::Changes
